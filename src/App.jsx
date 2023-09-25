@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { getMovieList } from "./api";
+import { getMovieList, searchMovie } from "./api";
 
 function App() {
   const [popularMovies, setPopularMovies] = useState([]);
@@ -10,13 +10,21 @@ function App() {
       setPopularMovies(results);
     });
   }, []);
-  console.log(getMovieList());
+
+  const search = async (q) => {
+    if (q.length > 3) {
+      const query = await searchMovie(q);
+      setPopularMovies(query.results);
+      console.log({ query: query });
+    }
+  };
+
   const PopularMovieList = () => {
     return popularMovies.map((movie, i) => {
       const posterUrl = `${"https://image.tmdb.org/t/p/original/"}${movie.poster_path}`;
       return (
         <div key={i} className="">
-          <div className="bg-white shadow-xl w-52 border border-gray-200 rounded-lg ">
+          <div className="bg-white shadow-xl w-72 border border-gray-200 rounded-lg ">
             <a href="#">
               <img className="rounded-t-lg" src={posterUrl} alt="" />
             </a>
@@ -39,7 +47,7 @@ function App() {
     <>
       <div className="flex m-5 items-center max-w-md mx-auto border bg-white rounded-lg " x-data="{ search: '' }">
         <div className="w-full">
-          <input type="search" className="w-full px-4 py-1 text-gray-800 rounded-full focus:outline-none" placeholder="search" x-model="search" />
+          <input type="search" onChange={({ target }) => search(target.value)} className="w-full px-4 py-1 text-gray-800 rounded-full focus:outline-none" placeholder="search" x-model="search" />
         </div>
         <div>
           <button type="submit" className="flex items-center bg-blue-500 justify-center w-12 h-12 text-white rounded-r-lg">
@@ -50,7 +58,7 @@ function App() {
         </div>
       </div>
 
-      <div className="mx-auto flex-wrap flex flex-row gap-1">
+      <div className="flex flex-wrap justify-center gap-10">
         <PopularMovieList />
       </div>
     </>
